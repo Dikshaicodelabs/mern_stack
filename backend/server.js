@@ -1,7 +1,11 @@
 const express = require("express");
 const cors = require("cors");
 const User = require("./models/userModel");
+const Login= require('./controllers/login')
 const connectDb = require("./db");
+const authMiddleware = require("./middlewares/authMiddleware");
+const getAllUsers = require("./controllers/users");
+const deleteUser = require("./controllers/deleteUser");
 const app = express();
 const PORT = 1100; // Make sure to use the same port number
 
@@ -10,15 +14,10 @@ app.use(express.json());
 app.use(cors());
 connectDb();
 // Test route to check if backend is working
-app.get("/users", async (req, res) => {
-    
-    try {
-        const users = await User.find();
-        res.json(users);
-    } catch (error) {
-        res.status(500).json({ error: 'Internal server error' });
-    }
-});
+app.post("/user",Login)
+// app.get("/all-users", authMiddleware, getAllUsers)
+app.get('/all-users',getAllUsers)
+app.delete('/delete/:id',deleteUser)
 
 // Register route to create a new user
 app.post("/register", async (req, resp) => {
@@ -33,7 +32,7 @@ app.post("/register", async (req, resp) => {
     const user = new User(req.body);
     let result = await user.save();
     result = result.toObject();
-
+    
     // Remove password (if included) before sending the response
     delete result.password;
     console.log(result)
