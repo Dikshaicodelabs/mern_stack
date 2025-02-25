@@ -6,7 +6,6 @@ function authMiddleware(req, res, next) {
   // Get the token from the Authorization header
   const token =
     req.header("Authorization") && req.header("Authorization").split(" ")[1];
-
   if (!token) {
     return res
       .status(401)
