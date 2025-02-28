@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { useParams,Link } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import { signIn } from "./redux/slices/UserSlice";
-import { useDispatch, } from "react-redux";
+import { useDispatch } from "react-redux";
 const UpdateUserForm = () => {
   const [user, setUser] = useState({});
   // console.log(user, '///////////////////')
@@ -12,10 +12,16 @@ const UpdateUserForm = () => {
   const [dob, setDob] = useState("");
   const [bio, setBio] = useState("");
   const [suggesstions, setSuggesstions] = useState("");
-  const dispatch= useDispatch()
+  const [image, setImage] = useState("");
+  const dispatch = useDispatch();
 
   const { id } = useParams();
-
+  function arrayBufferToBase64(buffer) {
+    var binary = '';
+    var bytes = [].slice.call(new Uint8Array(buffer));
+    bytes.forEach((b) => binary += String.fromCharCode(b));
+    return window.btoa(binary);
+};
   const getUser = async () => {
     const result = await fetch("http://localhost:1100/get-user/" + id);
     console.log(result, "result;;;;;");
@@ -27,6 +33,7 @@ const UpdateUserForm = () => {
     setDob(data.data.dob);
     setBio(data.data.bio);
     setSuggesstions(data.data.suggesstions);
+    setImage(data.data.image);
   };
 
   const handleSubmit = async (id) => {
@@ -44,17 +51,21 @@ const UpdateUserForm = () => {
       }),
     });
     const data = await result.json();
-    dispatch(signIn({name,email,bio,suggesstions}))
-
-    
+    dispatch(signIn({ name, email, bio, suggesstions }));
   };
-  console.log(user, ">>>");
+  console.log(image, ">>>");
   useEffect(() => {
     getUser();
   }, []);
   return (
     <div>
       <form>
+        <img
+          src={`http://localhost:1100/images/${image}`}
+          alt="image"
+          height="100"
+          width="100"
+        />
         <label>Name:</label>&nbsp;&nbsp;
         <input
           type="text"
@@ -106,8 +117,10 @@ const UpdateUserForm = () => {
           Update Details
         </button>
       </form>
-      <br/>
-      <b><p>Click here to see all users!!!</p></b>
+      <br />
+      <b>
+        <p>Click here to see all users!!!</p>
+      </b>
       <Link to="/all-users">
         <button>Show all users </button>
       </Link>

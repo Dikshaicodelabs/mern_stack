@@ -8,21 +8,20 @@ const LoginForm = () => {
   
   
   const [email, setEmail] = useState('');
-  const token = localStorage.getItem("token");
-  console.log(token);
-  const [password, setPassword] = useState("");
+  
+  const [password, setPassword] = useState("")
   const navigate = useNavigate();
-  const handleOnSubmit = async (e) => {
-    e.preventDefault();
+  const handleOnSubmit = async () => {
+  
     const res = await fetch("http://localhost:1100/user", {
       method: "POST",
       body: JSON.stringify({ email, password }),
       headers: {
         "Content-Type": "application/json",
-        "Authorization": "Bearer "+ token
       },
     });
     const data = await res.json();
+    console.log(data,"datattatatat>>>>>>>>>>>>>>>>>>>>>.at")
     // console.log(data, '>>>>>>>>>>');
     localStorage.setItem("token", data.token);
     sessionStorage.setItem("token-s", data.token);
@@ -31,9 +30,10 @@ const LoginForm = () => {
     //   setEmail("");
     //   setPassword("");
     // }
-    console.log(data.data,"datattatatatat")
+    
 
     const userId = data.data._id;
+    console.log(userId, 'ists sddssd idddddd')
     localStorage.setItem("id", userId);
     
     navigate(`/update-user/${userId}`);
@@ -74,7 +74,9 @@ const LoginForm = () => {
         />
         <br />
         <br />
-        <button type="submit" onClick={handleOnSubmit}>
+        <button type="submit" onClick={(e)=>{
+          e.preventDefault()
+          handleOnSubmit()}}>
           submit
         </button>
       </form>

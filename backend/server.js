@@ -12,44 +12,55 @@ const app = express();
 const PORT = 1100; // Make sure to use the same port number
 const multer = require("multer");
 const router = express.Router()
+const bcrypt = require("bcrypt");
+const saltRounds = 10;
+
 // Middleware
 app.use(express.json());
 app.use(cors());
 connectDb();
-// Test route to check if backend is working
 app.post("/user",Login)
 app.get("/all-users", authMiddleware, getAllUsers)
-// app.get('/all-users',getAllUsers)
 app.get('/get-user/:id',getUser)
 app.delete('/delete/:id',deleteUser)
 app.patch('/update-user/:id',updateUser)
+
+const fs = require('fs');
+const path = './public/images';
+
+if (!fs.existsSync(path)) {
+  fs.mkdirSync(path, { recursive: true });
+}
 // Register route to create a new user
-app.post("/register", async (req, resp) => {
-  try {
+// app.post("/register", async (req, resp) => {
+//   console.log(' register block')
+//   try {
 
-    const existingUser = await User.findOne({ email: req.body.email });
-    if (existingUser) {
-      return resp.status(400).send("User already registered");
-    }
+//     const existingUser = await User.findOne({ email: req.body.email });
+//     if (existingUser) {
+//       return resp.status(400).send("User already registered");
+//     }
 
     
-    const user = new User(req.body);
-    let result = await user.save();
-    result = result.toObject();
+//     const user = new User(req.body);
+//     let result = await user.save();
+//     result = result.toObject();
     
-    // Remove password (if included) before sending the response
-    delete result.password;
-    console.log(result)
+//     // Remove password (if included) before sending the response
+//     delete result.password;
+//     console.log(result)
 
 
-    resp
-      .status(201)
-      .send({ message: "User registered successfully", user: result });
-  } catch (e) {
-    console.error(e);
-    resp.status(500).send("Something Went Wrong");
-  }
-});
+//     resp
+//       .status(201)
+//       .send({ message: "User registered successfully", user: result });
+//   } catch (e) {
+//     console.error('register errorrr',e);
+//     resp.status(500).send("Something Went Wrong");
+//   }
+// });
+
+
 
 // image storage
 
@@ -69,26 +80,46 @@ const upload = multer({
     fieldSize:1024 * 1024 * 3,
   },
 })
-//router 
-router.post('/insert',upload.single('image'), (req, res) => {
-  var newItem = new User({
-    name: req.body.name,
-    email: req.body.email,
-    password: req.body.password,
-    // director: req.body.director,
-    // year: req.body.year,
-    image: req.file.filename
-  })
-  newItem.save((err, doc) => {
-    if (!err) {
-      res.redirect('insert');
-      console.log(req.file.filename);
+
+
+
+app.post('/insert', upload.single('image'), async (req, res) => {
+  console.log(req.body,"inside body")
+  try {
+    const { name, email, password } = req.body;
+
+    // Check if password is provided
+    if (!password) {
+      return res.status(400).send('Password is required.');
     }
-    else {
-      console.log(err);
-    }
-  });
+  console.log(password, "password");
+  console.log(saltRounds,"saltRounds");
+    // Hash the password with bcrypt
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+
+    const imageUrl = `/images/${req.file.filename}`;
+
+    const newUser = new User({
+      name: name,
+      email: email,
+      password: hashedPassword,  // Save the hashed password
+      image: req.file ? imageUrl : null,  // Save image filename if uploaded
+    });
+
+   const resp = await newUser.save();
+   
+   res.status(200).send({message:"User created"});
+   
+  } catch (error) {
+    console.error(error, 'routeer post ');
+    res.status(500).send("Server error during user creation.");
+  }
 });
+
+app.use('/images', express.static('public/images'));
+
+
+  
 // Start the server
 app.listen(PORT, () => {
   console.log(`Server is listening on port ${PORT}`);

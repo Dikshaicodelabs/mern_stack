@@ -20,7 +20,7 @@ const handleOnSubmit = async (e) => {
   e.preventDefault();
   
   try {
-    const result = await fetch("http://localhost:1100/register", {
+    const result = await fetch("http://localhost:1100/insert", {
       method: "POST",
       body: formData,  // Sending the FormData directly
       headers: {

@@ -11,19 +11,20 @@ const Login = async (req, res) => {
   try {
     const user = await User.findOne({ email });
 
-    
+    console.log(user, 'userrrrrrrrrr')
     if (!user) {
       return res.status(401).json({ error: "Authentication failed" });
     }
+    console.log('lsdsf')
     const passwordMatch = await bcrypt.compare(password, user.password);
+  
 
-    
     if (!passwordMatch) {
+      console.log('not matcheddd ')
       return res.status(401).json({ error: "Authentication failed" });
     }
-    if (!passwordMatch) {
-      return res.status(401).json({ error: "Authentication failed" });
-    }
+   
+    console.log('rtrhrjhk')
     const token = jwt.sign({ userId: user._id }, "your-secret-key", {
       expiresIn: "1h",
     });

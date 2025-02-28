@@ -4,6 +4,7 @@ import { signOut } from "./redux/slices/UserSlice";
 import { useDispatch } from "react-redux";
 const Users = () => {
   const [users, setUsers] = useState([]);
+  const [image,setImage]= useState('');
   const user_id= localStorage.getItem("id");
   console.log("id", user_id)
   const token = localStorage.getItem("token");
@@ -19,8 +20,9 @@ const Users = () => {
       }
     );
     const data = await result.json();
-
+   console.log(data.data, "data>>>>>>>>>>>")
     setUsers(data.data);
+   
   };
  
 
@@ -52,6 +54,7 @@ const Users = () => {
     getUsers();
   }, []);
   console.log(users, ">>>>>>>");
+  console.log(image,'>>>>>>>>>>>>>>>>>>>>>>;kkj')
   return (
     <>
       <h1>all users</h1>
@@ -61,6 +64,7 @@ const Users = () => {
           <span>{user.name}</span>&nbsp;&nbsp;
           <b>EMAIL</b>&nbsp;&nbsp;
           <span>{user.email}</span>
+          <img src={`http://localhost:1100/images/${user.image}`}  height="100" width="100" alt="image" />
           <button onClick={() => handleDelete(user._id)}>Delete</button>
           <hr />
         </div>

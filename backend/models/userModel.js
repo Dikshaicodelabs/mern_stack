@@ -6,7 +6,7 @@ const UserSchema = new mongoose.Schema(
   {
     name: {
       type: String,
-      // required: true,
+  // required: true,
     },
     email: {
       type: String,
@@ -30,29 +30,38 @@ const UserSchema = new mongoose.Schema(
       default: "",
     },
     image: {
-      data: Buffer,
-      contentType: String,
+     type:String
+    //  data: Buffer, 
+    //  contentType: String
     },
   },
   { timestamps: true }
 );
 
-UserSchema.pre("save", async function (next) {
-  if (this.isModified("password") || this.isNew) {
-    try {
-      const hashedPassword = await bcrypt.hash(this.password, saltRounds);
-      this.password = hashedPassword;
-      next();
-    } catch (err) {
-      next(err);
-    }
-  } else {
-    next();
-  }
-});
+// UserSchema.pre("save", async function (next) {
+//   if (this.isModified("password") || this.isNew) {
+//     try {
+//       const hashedPassword = await bcrypt.hash(this.password, saltRounds);
+//       this.password = hashedPassword;
+//       next();
+//     } catch (err) {
+//       next(err);
+//     }
+//   } else {
+//     next();
+//   }
+// });
 
 const User = mongoose.model("users", UserSchema);
 
 module.exports = User;
+
+
+
+
+
+
+
+
 
 
